@@ -10,6 +10,7 @@ export class UsersController {
   createUser(@Body() { email, password }: CreateUserDTO, @Res() res: Response) {
     if (password.length <= 7) {
       res.status(400).send('Password must be at least 8 characters long');
+      return;
     }
     this.auth.create(email, password);
     return 'user created';
