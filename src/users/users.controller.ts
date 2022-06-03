@@ -4,12 +4,14 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Put,
   Query,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateUserDTO } from './dtos/create-user.dto';
+import { UpdateUserDTO } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('auth')
@@ -36,7 +38,10 @@ export class UsersController {
   async findAll(@Query('email') email: string) {
     return await this.auth.find(email);
   }
-
+  @Patch(':-id')
+  async updateUserDTO(@Param('id') id: string, @Body() body: UpdateUserDTO) {
+    return await this.auth.update(parseInt(id), body);
+  }
   @Delete('remove/:id')
   async removeUser(@Param('id') id: string, @Res() res: Response) {
     res
