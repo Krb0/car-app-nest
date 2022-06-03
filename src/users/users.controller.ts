@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Put,
@@ -31,25 +33,34 @@ export class UsersController {
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.auth.findOne(parseInt(id));
-    return user ? user : 'User not found';
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   @Get()
   async findAll(@Query('email') email: string) {
-    return await this.auth.find(email);
+    const users = await this.auth.find(email);
+    if (!users) {
+      throw new NotFoundException('User not found');
+    }
+    return users;
   }
-  @Patch(':-id')
+  @Patch(':id')
   async updateUserDTO(@Param('id') id: string, @Body() body: UpdateUserDTO) {
-    return await this.auth.update(parseInt(id), body);
+    const update = await this.auth.update(parseInt(id), body);
+    if (!update) {
+      throw new ForbiddenException('Invalid Credentials');
+    }
+    return update;
   }
   @Delete('remove/:id')
   async removeUser(@Param('id') id: string, @Res() res: Response) {
-    res
-      .status(200)
-      .send(
-        (await this.auth.remove(parseInt(id)))
-          ? 'User removed'
-          : 'User not found',
-      );
+    const removed = await this.auth.remove(parseInt(id));
+    if (!removed) {
+      throw new NotFoundException('User not found');
+    }
+    res.status(200).send(removed);
   }
 }
