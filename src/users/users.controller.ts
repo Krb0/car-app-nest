@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   ForbiddenException,
@@ -10,6 +11,7 @@ import {
   Put,
   Query,
   Res,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateUserDTO } from './dtos/create-user.dto';
@@ -29,7 +31,7 @@ export class UsersController {
     this.auth.create(email, password);
     res.status(201).send('User created');
   }
-
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.auth.findOne(parseInt(id));
